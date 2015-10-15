@@ -13,6 +13,26 @@ for (i in yearly.brfss){
   i <- tbl_df(i)
 }
 
+##looing at whether they have asthma now
+for (i in yearly.brfss){
+  if("ASTHNOW" %in% colnames(i)) {print("includes ASTHNOW var")}
+  else {print("no, does not have ASTHNOW var")}
+}
+#2003 does not have ASTHNOW, has CASTHNOW instead (what is difference?)
+table(brfss.2002$ASTHNOW, useNA = "ifany")
+table(brfss.2003$CASTHNOW, useNA = "ifany") #variable takes on different possible values than ASTHNOW
+#for now, going to skip ASTHNOW variable, and just use ASTHMA2 (ever had asthma)
+#going to code 2003 ASTHNOW as all NAs so I can bring in ASTHNOW variable for other years
+brfss.2003$ASTHNOW <- rep(NA, length(brfss.2003$CASTHNOW))
+
+for (i in yearly.brfss){
+  if("HISPANC2" %in% colnames(i)) {print("includes HISPANC2 var")}
+  else {print("no, does not have ASTHNOW var")}
+}
+
+#1=yes, 2=no, 7=Don't know/Not sure, 9=Refused, NA is for people who have never had asthma, so will count them as NOs
+table(brfss.2002$ASTHMA2, useNA = "ifany")
+
 #variable name changed to ASTHMA3 from ASTHMA2 in 2011, the questions are almost identical
 brfss.2011$ASTHMA2 <- brfss.2011$ASTHMA3
 brfss.2012$ASTHMA2 <- brfss.2012$ASTHMA3
@@ -30,8 +50,8 @@ brfss.2010$BMICAT <- brfss.2010$F__BMI4CAT
 brfss.2011$BMICAT <- recode(brfss.2011$F__BMI5CAT, recodes = ("c(1,2) = 1; 3=2; 4=3; else=9"))
 brfss.2012$BMICAT <- recode(brfss.2012$F__BMI5CAT, recodes = ("c(1,2) = 1; 3=2; 4=3; else=9"))
 
-variables.to.keep <- c("ASTHMA2", "GENHLTH", "SMOKE100", "AGE", "EDUCA",
-                       "INCOME2", "SEX", "RACE2", "BMICAT", "CntyFIPS") 
+variables.to.keep <- c("ASTHMA2", "ASTHNOW", "GENHLTH", "SMOKE100", "AGE", "EDUCA",
+                       "INCOME2", "SEX", "RACE2", "HISPANC2", "BMICAT", "CntyFIPS") 
 
 reduced.2002 <- brfss.2002[,variables.to.keep]
 reduced.2003 <- brfss.2003[,variables.to.keep]
@@ -68,4 +88,4 @@ library(data.table)
 brfss.all.years <- rbindlist(yearly.reduced)
 
 ##create new complete file 
-write.csv(brfss.all.years, file = "brfss_complete.csv")
+write.csv(brfss.all.years, file = "brfss_complete_whispanc.csv")
