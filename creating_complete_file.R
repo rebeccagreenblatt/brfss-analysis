@@ -13,7 +13,25 @@ for (i in yearly.brfss){
   i <- tbl_df(i)
 }
 
-##looing at whether they have asthma now
+##looking at CNTYWT 
+for (i in yearly.brfss){
+  if("F__CNTYWT" %in% colnames(i)) {print("includes CNTYWT var")}
+  else {print("no, does not have CNTYWT var")}
+}
+##2002 is called A_CNTYWT
+brfss.2002$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2002$A_CNTYWT)))
+brfss.2003$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2003$F__CNTYWT)))
+brfss.2004$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2004$F__CNTYWT)))
+brfss.2005$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2005$F__CNTYWT)))
+brfss.2006$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2006$F__CNTYWT)))
+brfss.2007$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2007$F__CNTYWT)))
+brfss.2008$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2008$F__CNTYWT)))
+brfss.2009$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2009$F__CNTYWT)))
+brfss.2010$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2010$F__CNTYWT)))
+brfss.2011$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2011$F__CNTYWT)))
+brfss.2012$CNTYWT <- as.numeric(gsub(",","", as.character(brfss.2012$F__CNTYWT)))
+
+##looking at whether they have asthma now
 for (i in yearly.brfss){
   if("ASTHNOW" %in% colnames(i)) {print("includes ASTHNOW var")}
   else {print("no, does not have ASTHNOW var")}
@@ -37,6 +55,28 @@ table(brfss.2002$ASTHMA2, useNA = "ifany")
 brfss.2011$ASTHMA2 <- brfss.2011$ASTHMA3
 brfss.2012$ASTHMA2 <- brfss.2012$ASTHMA3
 
+##SMOKER
+for (i in yearly.brfss){
+  if("F__SMOKER3" %in% colnames(i)) {print("includes SMOKER var")}
+  else {print("no, does not have SMOKER var")}
+}
+##2002: variable is named A_SMOKER
+##2003-2004: variable is F__SMOKER2
+##2005-2012: variable is F__SMOKER3
+
+#renaming all to smoker
+brfss.2002$SMOKER <- brfss.2002$A_SMOKER
+brfss.2003$SMOKER <- brfss.2003$F__SMOKER2
+brfss.2004$SMOKER <- brfss.2004$F__SMOKER2
+brfss.2005$SMOKER <- brfss.2005$F__SMOKER3
+brfss.2006$SMOKER <- brfss.2006$F__SMOKER3
+brfss.2007$SMOKER <- brfss.2007$F__SMOKER3
+brfss.2008$SMOKER <- brfss.2008$F__SMOKER3
+brfss.2009$SMOKER <- brfss.2009$F__SMOKER3
+brfss.2010$SMOKER <- brfss.2010$F__SMOKER3
+brfss.2011$SMOKER <- brfss.2011$F__SMOKER3
+brfss.2012$SMOKER <- brfss.2012$F__SMOKER3
+
 ##BMI variable had various names/various category numbers -- normalizing to 3 categories, where 9 is NA
 brfss.2002$BMICAT <- brfss.2002$A_BMI2CA
 brfss.2003$BMICAT <- brfss.2003$F__BMI3CAT
@@ -50,8 +90,8 @@ brfss.2010$BMICAT <- brfss.2010$F__BMI4CAT
 brfss.2011$BMICAT <- recode(brfss.2011$F__BMI5CAT, recodes = ("c(1,2) = 1; 3=2; 4=3; else=9"))
 brfss.2012$BMICAT <- recode(brfss.2012$F__BMI5CAT, recodes = ("c(1,2) = 1; 3=2; 4=3; else=9"))
 
-variables.to.keep <- c("ASTHMA2", "ASTHNOW", "GENHLTH", "SMOKE100", "AGE", "EDUCA",
-                       "INCOME2", "SEX", "RACE2", "HISPANC2", "BMICAT", "CntyFIPS") 
+variables.to.keep <- c("ASTHMA2", "ASTHNOW", "GENHLTH", "SMOKE100", "SMOKER", "AGE", "EDUCA",
+                       "INCOME2", "SEX", "RACE2", "HISPANC2", "BMICAT", "CntyFIPS", "CNTYWT") 
 
 reduced.2002 <- brfss.2002[,variables.to.keep]
 reduced.2003 <- brfss.2003[,variables.to.keep]
@@ -89,3 +129,9 @@ brfss.all.years <- rbindlist(yearly.reduced)
 
 ##create new complete file 
 write.csv(brfss.all.years, file = "brfss_complete_whispanc.csv")
+
+##creating complete with smoker
+write.csv(brfss.all.years, file = "brfss.complete.wsmoker.csv")
+
+##creating complete with countywts
+write.csv(brfss.all.years, file = "brfss.complete.wcntywts.csv")
