@@ -13,13 +13,13 @@ dim(pm2.5_dat)
 
 head(ozone_dat)
 
-brfss <- read.csv("brfss_complete_whispanc.csv")
+brfss <- read.csv("brfss.complete.wcntywts.csv")
 dim(brfss)
 
 brfss$CntyFIPS <- as.integer(gsub(",","", as.character(brfss$CntyFIPS)))
 
-dat <- inner_join(ozone_dat, brfss, by = c("id", "CntyFIPS"))
-#dat <- inner_join(pm2.5_dat, brfss, by = c("id", "CntyFIPS"))
+#dat <- inner_join(ozone_dat, brfss, by = c("id", "CntyFIPS"))
+dat <- inner_join(pm2.5_dat, brfss, by = c("id", "CntyFIPS"))
 
 dat$asthma <- recode(dat$ASTHMA2, recodes = "1=1; 2=0; else=NA")
 dat$asthma_now <- recode(dat$ASTHNOW, recodes = "1=1; 2=0; else = NA") #where 1 will equal yes, still have it, 2 = not anymore
@@ -31,6 +31,10 @@ table(dat$SMOKE100)
 #1=yes, 2=no, 7=Don't know/Not sure, 9=Refused
 dat$smoke100 <- recode(dat$SMOKE100, recodes = "1=1; 2=0; else = NA")
 chisq.test(table(dat$asthma, dat$smoke100)) #p-value < 2.2e-16
+
+#SMOKER
+dat$smoker <- recode(dat$SMOKER, recodes="1:2='current smoker'; 3='former smoker'; 4='never smoked';9=NA", as.factor.result=T)
+dat$smoker <- relevel(dat$SMOKER, ref='never smoked')
 
 #AGE --> age
 hist(dat$AGE)
@@ -111,8 +115,9 @@ boxplot(F95th ~ asthma, data = dat)
 boxplot(F3rd_max ~ asthma, data = dat)
 boxplot(sd ~ asthma, data = dat)
 cor(dat$median_measurement, dat$asthma, use = "complete.obs")
+boxplot(dat$F95th ~ dat$asthma_now)
 
-model <- glm(asthma ~ smoke100 + age + educa + inc.lt35k + 
+model <- glm(asthma ~ smoker + age + educa + inc.lt35k + 
                sex + race + hispanc + bmicat + F95th, data = dat) 
 summary(model)
 odds_ratios <- exp(coef(model))
@@ -278,4 +283,7 @@ odds_ratios <- exp(coef(model))
 # 1.0132231 
 # F95th 
 # 0.9999897 
+
+model <- glm(asthma_now ~ smoker + age + educa + inc.lt35k + 
+               sex + race + hispanc + bmicat + F95th, data = dat) 
 

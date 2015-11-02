@@ -12,7 +12,6 @@ library(car)
 BRFSS.complete.allvars <- read.csv("brfss.complete.wcntywts.csv")
 BRFSS.complete.allvars$CntyFIPS <- as.integer(gsub(",","", as.character(BRFSS.complete.allvars$CntyFIPS)))
 BRFSS.complete.allvars$STSTR <- BRFSS.complete.allvars$CntyFIPS #think this is what STSTR was in Omar's file... 
-rename(BRFSS.complete.allvars, c("ASTHMA2" = "ASTHMA", "INCOME2" = "INCOME", "RACE2" = "RACE"))
 names(BRFSS.complete.allvars)[names(BRFSS.complete.allvars)=="ASTHMA2"] <- "ASTHMA"
 names(BRFSS.complete.allvars)[names(BRFSS.complete.allvars)=="INCOME2"] <- "INCOME"
 names(BRFSS.complete.allvars)[names(BRFSS.complete.allvars)=="RACE2"] <- "RACE"
@@ -38,6 +37,8 @@ BRFSS.complete$ASTHMA<-relevel(BRFSS.complete$ASTHMA, ref='0')
 ##Asthma Now (for second time around -- starting with ASTHNOW)
 ##need to confirm that 0 also means N/A... responses 1 and 2 roughly add up to people who responded yes to ever having asthma, so just sticking with these
 BRFSS.complete$ASTHMA <- recode(BRFSS.complete$ASTHMA, recodes = "1=1; 2=0; else = NA")
+BRFSS.complete$ASTHMA <- as.factor(BRFSS.complete$ASTHMA)
+BRFSS.complete$ASTHMA<-relevel(BRFSS.complete$ASTHMA, ref='0')
 #------------------------
 
 #Race/ethnicity
@@ -67,7 +68,7 @@ BRFSS.complete$SMOKER <- relevel(BRFSS.complete$SMOKER, ref='never smoked')
 BRFSS.complete$BMI <- recode(BRFSS.complete$BMI, recodes="1='neither overweight nor obese'; 2='overweight'; 3='obese';c(0,9)=NA", as.factor.result=T)
 BRFSS.complete$BMI <- relevel(BRFSS.complete$BMI, ref='neither overweight nor obese')
 
-BRFSS.complete <- BRFSS.complete[ -c(1) ]
+#BRFSS.complete <- BRFSS.complete[ -c(1) ] 
 
 BRFSS.complete <- BRFSS.complete[ which(BRFSS.complete$ASTHMA !='NA' ), ]
 
